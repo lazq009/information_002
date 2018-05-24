@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
 from flask_wtf.csrf import CSRFProtect
 from flask_session import Session
-
-
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
 class Config(object):
     ''' 配置文件的加载'''
@@ -41,7 +41,12 @@ redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
 CSRFProtect(app)
 # 配置flask_session 将session 数据写入到redis数据库
 Session(app)
-
+# 创建脚本管理器对象
+manager = Manager(app)
+# 让迁移和app 和 db 建立关联
+Migrate(app, db)
+# 将迁移的脚本命令 添加到manager
+manager.add_command('mysql', MigrateCommand)
 @app.route('/')
 def index():
     # 测试下 redis
@@ -55,4 +60,4 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run()
+    manager.run()
