@@ -2,6 +2,8 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
 from flask_wtf.csrf import CSRFProtect
+from flask_session import Session
+
 
 
 class Config(object):
@@ -19,6 +21,15 @@ class Config(object):
     # 这里写的格式和SQLALchemy 的配置一样  但是  app 不会自动的读取  需要自己来读
     REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
+    # 配置flask_session 将session数据写入到服务器的redis数据库
+    # 指定session 数据库储存在redis
+    SESSION_TYPE = 'redis'
+    # 告诉session 服务器redis的位置
+    SESSION_REDIS = StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+    # 是否将session签名后在存储
+    SESSION_USE_SIGNER = True
+    # 当SESSION_PERMANENT 为True 时 设置session 的有效期才可以成立  正好默认的就是true
+    PERMANENT_SESSION_LIFETIME = 60*60*24  #自定义为一天的有效期
 app = Flask(__name__)
 # 配置必须放前面
 app.config.from_object(Config)
@@ -28,12 +39,18 @@ db = SQLAlchemy(app)
 redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
 # 开启csrf 保护
 CSRFProtect(app)
+# 配置flask_session 将session 数据写入到redis数据库
+Session(app)
 
 @app.route('/')
 def index():
     # 测试下 redis
-    redis_store.set('name', 'xjzx')
+    # redis_store.set('name', 'xjzx')
 
+    # 测试session
+    from flask import session
+    # 会将session 数据 写入到 浏览器的cookie
+    session['name'] = 'xxx'
     return 'hello world'
 
 
