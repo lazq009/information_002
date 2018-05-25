@@ -1,11 +1,8 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from redis import StrictRedis
-from flask_wtf.csrf import CSRFProtect
-from flask_session import Session
+
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from config import Config
+from info import app, db
+
 
 # class Config(object):
 #     ''' 配置文件的加载'''
@@ -33,23 +30,27 @@ from config import Config
 #     PERMANENT_SESSION_LIFETIME = 60*60*24  #自定义为一天的有效期
 
 
-app = Flask(__name__)
-# 配置必须放前面
-app.config.from_object(Config)
-# 创建链接到数据库的对象
-db = SQLAlchemy(app)
-# 创建redis数据库的对象
-redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
-# 开启csrf 保护
-CSRFProtect(app)
-# 配置flask_session 将session 数据写入到redis数据库
-Session(app)
+# app = Flask(__name__)
+# # 配置必须放前面
+# app.config.from_object(Config)
+# # 创建链接到数据库的对象
+# db = SQLAlchemy(app)
+# # 创建redis数据库的对象
+# redis_store = StrictRedis(host=Config.REDIS_HOST, port=Config.REDIS_PORT)
+# # 开启csrf 保护
+# CSRFProtect(app)
+# # 配置flask_session 将session 数据写入到redis数据库
+# Session(app)
+
+
 # 创建脚本管理器对象
 manager = Manager(app)
 # 让迁移和app 和 db 建立关联
 Migrate(app, db)
 # 将迁移的脚本命令 添加到manager
 manager.add_command('mysql', MigrateCommand)
+
+
 @app.route('/')
 def index():
     # 测试下 redis
