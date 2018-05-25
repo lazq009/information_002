@@ -43,3 +43,11 @@ class UnittestConfig(Config):
     TESTING = True
     # 指定测试用数据库
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/information_pro_002'
+
+
+# 准备工厂方法的create_app（参数）的原材料
+configs = {
+    'dev': DevelopmentConfig,
+    'pro': ProductionConfig,
+    'unit': UnittestConfig
+}
