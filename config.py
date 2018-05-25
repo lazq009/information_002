@@ -24,3 +24,22 @@ class Config(object):
     SESSION_USE_SIGNER = True
     # 当SESSION_PERMANENT 为True 时 设置session 的有效期才可以成立  正好默认的就是true
     PERMANENT_SESSION_LIFETIME = 60*60*24  #自定义为一天的有效期
+
+
+class DevelopmentConfig(Config):
+    '''开发环境下的配置'''
+    pass
+
+class ProductionConfig(Config):
+    '''生产环境下的配置'''
+    # 关闭调试模式
+    DEBUG = False
+    # 指定生产环境下的数据库
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/information_pro_002'
+
+class UnittestConfig(Config):
+    '''开发环境下'''
+    # 开启测试模式
+    TESTING = True
+    # 指定测试用数据库
+    SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/information_pro_002'
