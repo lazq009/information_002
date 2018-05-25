@@ -1,4 +1,5 @@
 from redis import StrictRedis
+import logging
 
 class Config(object):
     ''' 配置文件的加载'''
@@ -29,6 +30,8 @@ class Config(object):
 class DevelopmentConfig(Config):
     '''开发环境下的配置'''
     pass
+    LEVEL_LOG = logging.DEBUG
+
 
 class ProductionConfig(Config):
     '''生产环境下的配置'''
@@ -36,6 +39,7 @@ class ProductionConfig(Config):
     DEBUG = False
     # 指定生产环境下的数据库
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/information_pro_002'
+    LEVEL_LOG = logging.ERROR
 
 class UnittestConfig(Config):
     '''开发环境下'''
@@ -43,7 +47,7 @@ class UnittestConfig(Config):
     TESTING = True
     # 指定测试用数据库
     SQLALCHEMY_DATABASE_URI = 'mysql://root:mysql@127.0.0.1:3306/information_pro_002'
-
+    LEVEL_LOG = logging.DEBUG
 
 # 准备工厂方法的create_app（参数）的原材料
 configs = {
