@@ -1,5 +1,5 @@
 
-from flask import Flask
+from flask import Flask, url_for
 from flask_sqlalchemy import SQLAlchemy
 from redis import StrictRedis
 from flask_wtf.csrf import CSRFProtect
@@ -8,6 +8,7 @@ from config import Config, DevelopmentConfig, ProductionConfig, UnittestConfig
 from config import configs
 import logging
 from logging.handlers import RotatingFileHandler
+from info.modules.index import index_blue
 
 
 def setup_log(level):
@@ -44,4 +45,8 @@ def create_app(config_name):
     CSRFProtect(app)
     # 配置flask_session 将session 数据写入到redis数据库
     Session(app)
+    # 将蓝图注册到app
+    app.register_blueprint(index_blue)
+
+
     return app
