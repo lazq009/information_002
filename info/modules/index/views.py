@@ -2,9 +2,9 @@
 
 from . import index_blue
 from info import redis_store
+from flask import render_template
 
 @index_blue.route('/')
 def index():
-    # 测试redis 数据库
-    redis_store.set('name', 'xxx')
-    return 'index'
+
+    return render_template('news/index.html')
