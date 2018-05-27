@@ -2,7 +2,7 @@
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
-from info import create_app, db
+from info import create_app, db, models #这里导入models仅仅是为了在迁徙时让manage知道models的存在
 
 # from werkzeug.routing import BaseConverter
 
