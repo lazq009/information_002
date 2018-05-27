@@ -8,7 +8,7 @@ from config import Config, DevelopmentConfig, ProductionConfig, UnittestConfig
 from config import configs
 import logging
 from logging.handlers import RotatingFileHandler
-from info.modules.index import index_blue
+
 
 
 def setup_log(level):
@@ -26,6 +26,8 @@ def setup_log(level):
 
 # 创建SQLALchemy 对象
 db = SQLAlchemy()
+redis_store = None
+
 
 def create_app(config_name):
     '''根据外界传入的配置环境参数 创建app'''
@@ -40,12 +42,15 @@ def create_app(config_name):
     # db = SQLAlchemy(app)
     db.init_app(app)
     # 创建redis数据库的对象
+    global redis_store
     redis_store = StrictRedis(host=configs[config_name].REDIS_HOST, port=configs[config_name].REDIS_PORT)
     # 开启csrf 保护
     CSRFProtect(app)
     # 配置flask_session 将session 数据写入到redis数据库
     Session(app)
     # 将蓝图注册到app
+    # 注意点   蓝图在哪里注册就哪里导入   避免在导入蓝图时某些变量还没加出来
+    from info.modules.index import index_blue
     app.register_blueprint(index_blue)
 
 
