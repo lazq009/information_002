@@ -4,6 +4,7 @@ from . import index_blue
 from info import redis_store
 from flask import render_template, current_app
 
+
 @index_blue.route('/')
 def index():
 
