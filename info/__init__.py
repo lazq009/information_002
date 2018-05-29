@@ -9,6 +9,7 @@ from config import configs
 import logging
 from logging.handlers import RotatingFileHandler
 from flask_wtf import csrf
+from info.utils.comment import do_rank
 
 
 
@@ -56,6 +57,9 @@ def create_app(config_name):
         # 2 将csrf_token 写入浏览器
         response.set_cookie('csrf_token', csrf_token)
         return response
+
+    # 将自定义的过滤器 函数  转换模板可以直接使用的过滤器
+    app.add_template_filter(do_rank, 'rank')
 
     # 配置flask_session 将session 数据写入到redis数据库
     Session(app)
