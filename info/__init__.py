@@ -8,6 +8,7 @@ from config import Config, DevelopmentConfig, ProductionConfig, UnittestConfig
 from config import configs
 import logging
 from logging.handlers import RotatingFileHandler
+from flask_wtf import csrf
 
 
 
@@ -45,7 +46,17 @@ def create_app(config_name):
     global redis_store
     redis_store = StrictRedis(host=configs[config_name].REDIS_HOST, port=configs[config_name].REDIS_PORT, decode_responses=True)
     # 开启csrf 保护
-    # CSRFProtect(app)
+    CSRFProtect(app)
+
+    # 业务一开始 就准备请求钩子  在每次的请求结束后向浏览器写入cookie
+    @app.after_request
+    def after_request(response):
+        # 1 生成csrf_token
+        csrf_token = csrf.generate_csrf()
+        # 2 将csrf_token 写入浏览器
+        response.set_cookie('csrf_token', csrf_token)
+        return response
+
     # 配置flask_session 将session 数据写入到redis数据库
     Session(app)
     # 将蓝图注册到app

@@ -130,6 +130,8 @@ $(function(){
             type:'post',
             data:JSON.stringify(params),
             contentType:'application/json',
+            // headers:{'key':cookie中的csrf_token}
+            headers:{'X-CSRFToken':getCookie('csrf_token')},
             success:function (response) {
                 if (response.errno == '0') {
                     // 登录成功后，刷新当前页面
@@ -185,6 +187,7 @@ $(function(){
             type:'post', // 请求方法
             data:JSON.stringify(params), // 请求参数
             contentType:'application/json', // 请求数据类型
+            headers:{'X-CSRFToken':getCookie('csrf_token')},
             success:function (response) {
                 if (response.errno == '0') {
                 //    注册成功后  刷新当前页面
@@ -251,6 +254,7 @@ function sendSMSCode() {
         type:'post',
         data:JSON.stringify(params),
         contentType:'application/json',
+        headers:{'X-CSRFToken':getCookie('csrf_token')},
         success:function (response) {
             if (response.errno == '0'){
                  // 发送成功后，进行倒计时
