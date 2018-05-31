@@ -1,7 +1,7 @@
 var currentCid = 1; // 当前分类 id
 var cur_page = 1; // 当前页
 var total_page = 1;  // 总页数
-var data_querying = true;   // 是否正在向后台获取数据
+var data_querying = true;   // 是否正在向后台获取数据  为True 时是正在加载  不能上拉
 
 
 $(function () {
@@ -9,22 +9,22 @@ $(function () {
     updateNewsData();
     // 首页分类切换
     $('.menu li').click(function () {
-        var clickCid = $(this).attr('data-cid')
+        var clickCid = $(this).attr('data-cid');
         $('.menu li').each(function () {
             $(this).removeClass('active')
-        })
-        $(this).addClass('active')
+        });
+        $(this).addClass('active');
 
         if (clickCid != currentCid) {
             // 记录当前分类id
-            currentCid = clickCid
+            currentCid = clickCid;
 
             // 重置分页参数
-            cur_page = 1
-            total_page = 1
+            cur_page = 1;
+            total_page = 1;
             updateNewsData()
         }
-    })
+    });
 
     //页面滚动加载相关
     $(window).scroll(function () {
@@ -43,20 +43,40 @@ $(function () {
 
         if ((canScrollHeight - nowScroll) < 100) {
             // TODO 判断页数，去更新新闻数据
+            if (!data_querying){
+                // 加载下一页数据
+                data_querying = true;
+                cur_page += 1;
+                // 判断是否是最后一页
+                if (cur_page < total_page){
+                    updateNewsData()
+                }
+            }
+
         }
     })
-})
+});
 
 function updateNewsData() {
     // TODO 更新新闻数据
      var params = {
         'cid':currentCid,
         'page':cur_page
+
         // 不需要传入per_page,因为默认10
     };
 
     $.get('/news_list', params, function (response) {
+        // 执行到这里说明数据加载完成，可能成功 可能失败
+        data_querying = false;  //表示没有正在加载的数据   可以上拉
+
         if (response.errno == '0') {
+            // 响应成功后   需要记录分页之后的总页数
+            total_page = response.data.total_page;
+            //清空第一页数据   为了不让前一个分类的第一页数据追加到下一个分类中
+            if (cur_page == 1){
+                $(".list_con").html('');
+            }
             // 获取数据成功，使用新的数据渲染界面
             for (var i=0;i<response.data.news_dict_List.length;i++) {
                 var news = response.data.news_dict_List[i]

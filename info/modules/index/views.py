@@ -3,7 +3,7 @@
 from . import index_blue
 from info import redis_store
 from flask import render_template, current_app, session, request, jsonify
-from info.models import User, News
+from info.models import User, News, Category
 from info import constants, response_code
 
 
@@ -47,7 +47,7 @@ def index_news_list():
     # 4.2 获取总页数：为了实现上拉刷新
     total_page = paginate.pages
     # 4.3 当前在第几页
-    current_page = paginate.pages
+    current_page = paginate.page
 
     # 因为json在序列化时，只认得字典或者列表，不认识模型对象列表
     # 所以需要将模型对象列表转成字典列表
@@ -65,11 +65,13 @@ def index_news_list():
     # 5.响应新闻数据
     return jsonify(errno=response_code.RET.OK, errmsg='OK', data=data)
 
+
 @index_blue.route('/')
 def index():
     """主页
         1.浏览器右上角用户信息：如果未登录主页右上角显示'登录、注册'；反之，显示'用户名 退出'
         2 主页点击排行
+        3 查询和展示新闻分类标签
         """
     # 1.浏览器右上角用户信息
     # 1.1 判断用户是否登录，直接从session中取出user_id
@@ -90,12 +92,20 @@ def index():
     except Exception as e:
         current_app.logger.error(e)
 
+    # 3 查询的展示新闻类标签
+    # categories == [Category,Category,Category,Category,Category,Category]
+    categories = []
+    try:
+        categories = Category.query.all()
+    except Exception  as e:
+        current_app.logger.error(e)
 
 
     # 构造模板上下文
     context = {
         'user': user,
-        'news_clicks': news_clicks
+        'news_clicks': news_clicks,
+        'categories': categories
     }
 
     return render_template('news/index.html', context=context)

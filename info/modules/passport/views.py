@@ -127,7 +127,6 @@ def register():
     # 注册即登录，所以记录最后一次登录的时间
     user.last_login = datetime.datetime.now()
 
-
     # 6.同步模型对象到数据库
     try:
         db.session.add(user)
