@@ -2,7 +2,7 @@
 from . import news_blue
 from flask import render_template, session, current_app, g, abort
 from info.models import User, News
-from info import constants
+from info import constants, db
 from info.utils.comment import user_login_data
 
 
@@ -20,6 +20,7 @@ def news_detail(news_id):
     1 获取登陆用户信息
     2.点击排行
     3.查询和展示新闻详情数据
+    4.更新点击量
     :param news_id: 要查询和展示的新闻的id
     '''
     # 封装函数的形式获取user
@@ -54,6 +55,13 @@ def news_detail(news_id):
         # 将来会自定义一个友好的404页面
         abort(404)
 
+    # 4.更新点击量
+    news.clicks += 1
+    try:
+        db.session.commit()
+    except Exception as e:
+        current_app.logger.error(e)
+        db.session.rollback()
 
 
     context = {
