@@ -9,7 +9,7 @@ from config import configs
 import logging
 from logging.handlers import RotatingFileHandler
 from flask_wtf import csrf
-from info.utils.comment import do_rank
+
 
 
 
@@ -59,6 +59,7 @@ def create_app(config_name):
         return response
 
     # 将自定义的过滤器 函数  转换模板可以直接使用的过滤器
+    from info.utils.comment import do_rank
     app.add_template_filter(do_rank, 'rank')
 
     # 配置flask_session 将session 数据写入到redis数据库
