@@ -46,9 +46,10 @@ $(function () {
             if (!data_querying){
                 // 加载下一页数据
                 data_querying = true;
-                cur_page += 1;
+
                 // 判断是否是最后一页
                 if (cur_page < total_page){
+                    cur_page += 1;
                     updateNewsData()
                 }
             }
