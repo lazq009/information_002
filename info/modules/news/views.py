@@ -261,6 +261,17 @@ def news_detail(news_id):
     except Exception as e:
         current_app.logger.error(e)
 
+    # 查询该登录用户给该新闻的哪些评论点了赞
+    comment_like_ids = []
+    if user:
+        try:
+            # 查询用户点赞了哪些评论  comment_like = [模型对象]
+            comment_likes = CommentLike.query.filter(CommentLike.user_id==user.id).all()
+            # 取出所有被用户点赞的评论id  comment_like_ids == 【】
+            comment_like_ids = [comment_like.comment_id for comment_like in comment_likes]
+        except Exception as e:
+            current_app.logger.error(e)
+
     # 为了读取模型类中的to_dict 封装后的结果  我选择遍历出每个模型类对象 转字典
     comment_dict_list = []
     for comment in comments:
@@ -269,6 +280,9 @@ def news_detail(news_id):
         comment_dict['is_like'] = False
         # if 当钱登录用户给这个评论点赞了就把is——like 设置为Ture
         #     comment_dict['is_like'] = True
+
+        if comment.id in comment_like_ids:
+            comment_dict['is_like'] = True
 
         comment_dict_list.append(comment_dict)
 
