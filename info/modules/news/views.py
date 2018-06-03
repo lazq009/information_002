@@ -68,7 +68,7 @@ def news_comment():
     }
 
     # 6 响应评论新闻和回复评论结果
-    return jsonify(errno=response_code.RET.OK, errmsg='评论成功', data=data)
+    return jsonify(errno=response_code.RET.OK, errmsg='评论成功', data=comment.to_dict())
 
 
 @news_blue.route('/news_collect', methods=['POST'])
