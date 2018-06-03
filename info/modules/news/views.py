@@ -143,6 +143,7 @@ def news_detail(news_id):
     3.查询和展示新闻详情数据
     4.更新点击量
     5.判断是否收藏
+    6 展示新闻评论和评论回复
     :param news_id: 要查询和展示的新闻的id
     '''
     # 封装函数的形式获取user
@@ -192,12 +193,27 @@ def news_detail(news_id):
         if news in user.collection_news:
             is_collected = True
 
+    # 6 展示新闻评论和评论回复
+    comments = []
+    try:
+        comments = Comment.query.filter(Comment.news_id==news_id).order_by(Comment.create_time.desc()).all()
+    except Exception as e:
+        current_app.logger.error(e)
+
+    # 为了读取模型类中的to_dict 封装后的结果  我选择遍历出每个模型类对象 转字典
+    comment_dict_list = []
+    for comment in comments:
+        comment_dict = comment.to_dict()
+        comment_dict_list.append(comment_dict)
+
 
     context = {
         'user': user,
         'news_clicks': news_clicks,
         'news': news.to_dict(),
-        'is_collected': is_collected
+        'is_collected': is_collected,
+        'comments': comment_dict_list
+
 
     }
     # 渲染新闻详情页
