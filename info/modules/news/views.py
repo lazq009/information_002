@@ -1,9 +1,70 @@
 # 新闻详情   收藏   评论
 from . import news_blue
 from flask import render_template, session, current_app, g, abort, jsonify, request
-from info.models import User, News, Comment
+from info.models import User, News, Comment, CommentLike
 from info import constants, db, response_code
 from info.utils.comment import user_login_data
+
+@news_blue.route('/comment_like', methods=['POST'])
+@user_login_data
+def comment_like():
+    '''评论和点赞'''
+    # 1 获取登录的信息
+    user = g.user
+    if not user:
+        return jsonify(errno=response_code.RET.SESSIONERR, errmsg='用户未登录')
+
+    # 2 获取参数
+    comment_id = request.json.get('comment_id')
+    action = request.json.get('action')
+
+    # 3 校验参数
+    if not all([comment_id, action]):
+        return jsonify(errno=response_code.RET.PARAMERR, errmsg='缺少参数')
+
+    if action not in ['add','remove']:
+        return jsonify(errno=response_code.RET.PARAMERR, errmsg='参数错误')
+
+    # 4 查询要点赞的评论是否存在
+    try:
+        comment = Comment.query.get(comment_id)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=response_code.RET.PARAMERR, errmsg='参数错误')
+    if not comment:
+        return jsonify(errno=response_code.RET.NODATA, errmsg='评论不存在')
+
+    # 5 点赞和取消点赞
+    # 查询要点赞的记录是否存在
+    comment_like_model = CommentLike.query.filter(CommentLike.comment_id==comment_id, CommentLike.user_id==user.id).first()
+    if action == 'add':
+        # 点赞
+        if not comment_like_model:
+            comment_like_model = CommentLike()
+            comment_like_model.comment_id = comment_id
+            comment_like_model.user_id = user.id
+            # 提交新闻记录
+            db.session.add(comment_like_model)
+
+            # 累计点赞量
+            comment.like_count += 1
+    else:
+        # 取消点赞
+        if comment_like_model:
+            # 删除该记录
+            db.session.delete(comment_like_model)
+            # 减少点赞量
+            comment.like_count -= 1
+
+    # 将点赞和取消点赞的数据同步到数据库
+    try:
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        current_app.logger.error(e)
+
+    # 6 响应点赞和取消点赞的结果
+    return jsonify(errno=response_code.RET.OK, errmsg='Ok')
 
 
 @news_blue.route('/news_comment', methods=['POST'])
