@@ -265,8 +265,12 @@ def news_detail(news_id):
     comment_dict_list = []
     for comment in comments:
         comment_dict = comment.to_dict()
-        comment_dict_list.append(comment_dict)
+        # 为了判断出每条评论中当前登录用户是否点赞了 给comment_dict 追加一个key(is-like), 默认未False
+        comment_dict['is_like'] = False
+        # if 当钱登录用户给这个评论点赞了就把is——like 设置为Ture
+        #     comment_dict['is_like'] = True
 
+        comment_dict_list.append(comment_dict)
 
     context = {
         'user': user,
